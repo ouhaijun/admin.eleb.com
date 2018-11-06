@@ -14,6 +14,12 @@
             <label>密码</label>
             <input type="password" name="password"  value="{{ old('password') }}" class="form-control">
         </div>
+        <div class="form-group">
+            <label>角色</label>
+            @foreach($roles as $role)
+            <input type="checkbox" name="role_id[]"  value="{{ $role->id }}">{{ $role->name }}
+            @endforeach
+        </div>
         {{ csrf_field() }}
         <button class="btn btn-primary btn-block">添加</button>
     </form>

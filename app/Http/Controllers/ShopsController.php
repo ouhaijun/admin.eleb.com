@@ -201,7 +201,9 @@ class ShopsController extends Controller
             dd($e);
             DB::rollBack();
         }
-
+        $shop_mail=User::select('email')->where('shop_id',$shop->id)->first();
+        $mail=$shop_mail->email;
+        $this->mail($shop->shop_name, $mail,'审核通过');
         return redirect('shop/list')->with('success','启用成功');
     }
     //审核(禁用)
@@ -229,6 +231,9 @@ class ShopsController extends Controller
             DB::rollBack();
         }
 
+        $shop_mail=User::select('email')->where('shop_id',$shop->id)->first();
+        $mail=$shop_mail->email;
+        $this->mail($shop->shop_name, $mail,'审核通过');
         return redirect('shop/list')->with('success','解除禁止成功');
 
     }
@@ -237,5 +242,12 @@ class ShopsController extends Controller
     public function upload(Request $request){
         $path=$request->file('file')->store('public/shop');
         return ['path'=>Storage::url($path)];
+    }
+
+    //发邮件
+    public function mail($name,$mail,$content){
+        \Illuminate\Support\Facades\Mail::send('mail',['name'=>$name],function($message)use($mail,$content){
+            $message->to($mail)->subject($content);
+        });
     }
 }

@@ -6,10 +6,13 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use function Sodium\compare;
+//use function Sodium\compare;
+use Spatie\Permission\Models\Role;
+//use Spatie\Permission\Traits\HasRoles;
 
 class AdminController extends Controller
 {
+    //use HasRoles;
     public function __construct()
     {
         //做权限验证
@@ -25,7 +28,8 @@ class AdminController extends Controller
     //添加
     public function create()
     {
-        return view('admin.add');
+        $roles=Role::all();
+        return view('admin.add',compact('roles'));
 
     }
 
@@ -42,12 +46,18 @@ class AdminController extends Controller
             'password.required'=>'密码不能为空',
             'password.min'=>'密码不能少于4位数',
         ]);
-        Admin::create([
+        $admin=Admin::create([
             'name'=>$request->name,
             'email'=>$request->email,
             'password'=>bcrypt($request->password),
             'remember_token'=>str_random(50),
         ]);
+
+        //dd($request->role_id);
+        if($request->role_id){
+            $admin->assignRole($request->role_id);
+        }
+
         return redirect('admins')->with('success','添加成功');
 
     }
@@ -62,13 +72,16 @@ class AdminController extends Controller
     public function edit(admin $admin)
 
     {
+        $roles=Role::all();
+        //dd($roles);
 
-        return view('admin.edit',compact('admin'));
+        return view('admin.edit',compact('admin','roles'));
 
     }
 
     public function update(admin $admin,Request $request)
     {
+
 
         $this->validate($request,[
             'name'=>'required',
@@ -87,6 +100,13 @@ class AdminController extends Controller
             'password'=>bcrypt($request->password),
             'remember_token'=>str_random(50),
         ]);
+        //dd($admin->getRoleNames());
+        $rolenames=$admin->getRoleNames();
+        foreach ($rolenames as $rolename){
+            //dd($rolename);
+            $admin->removeRole($rolename);
+        }
+        $admin->assignRole($request->role_id);
         return redirect('admins')->with('success','修改成功');
 
 

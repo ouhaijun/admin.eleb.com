@@ -80,3 +80,15 @@ Route::get('tong/month','TongJiController@month')->name('tong.month');
 Route::get('tong/look','TongJiController@look')->name('tong.look');
 //平台端最近三月菜品销量统计
 Route::get('tong/monthes','TongJiController@monthes')->name('tong.monthes');
+
+//权限
+Route::resource('permission','PermissionController');
+Route::resource('role','RoleController');
+
+//菜单
+Route::resource('nav','NavController');
+
+//抽奖活动
+Route::resource('event','EventController');
+//抽奖活动奖品管理
+Route::resource('eventprize','EventPrizeController');

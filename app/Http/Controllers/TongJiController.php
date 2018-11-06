@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Shops;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -36,16 +37,16 @@ created_at >='{$time_start}' and created_at<='{$time_end}' group by date(created
     {
         $time_start=date('Y-m-d 00:00:00',strtotime('-6 day'));
         $time_end=date('Y-m-d 23:59:59');
-        $sql="select date(orders.created_at) as date,order_details.goods_id,sum(order_details.amount) as total from order_details join orders on order_details.order_id=orders.id where orders.created_at>='{$time_start}' and orders.created_at<='{$time_end}' group by date(orders.created_at),order_details.goods_id";
+        $sql="select date(orders.created_at) as date, orders.shop_id, sum(order_details.amount) as total from order_details join orders on order_details.order_id=orders.id where orders.created_at>='{$time_start}' and orders.created_at<='{$time_end}' group by date(orders.created_at),orders.shop_id";
         $rows=DB::select($sql);
         //dd($rows);
         //构造7天统计格式
         $result = [];
-        //获取当前商家的菜品列表
-        $menus=Menu::select(['id','goods_name'])->get();
+        //获取当前商家列表
+        $menus=Shops::select(['id','shop_name'])->get();
         //dd($menus);
         $keyed=$menus->mapWithKeys(function ($item){
-            return [$item['id']=>$item['goods_name']];
+            return [$item['id']=>$item['shop_name']];
         });
         $keyed2 = $menus->mapWithKeys(function ($item) {
             return [$item['id'] => 0];
@@ -61,7 +62,7 @@ created_at >='{$time_start}' and created_at<='{$time_end}' group by date(created
             }
         }
         foreach($rows as $row){
-            $result[$row->goods_id][$row->date]=$row->total;
+            $result[$row->shop_id][$row->date]=$row->total;
         }
         $series=[];
         foreach ($result as $id=>$data){
@@ -115,7 +116,7 @@ GROUP BY
         $time_end=date('Y-m-d 23:59:59');
         $sql="SELECT
 	DATE_FORMAT(orders.created_at,'%Y-%m') AS date,
-	order_details.goods_id,
+	orders.shop_id,
 	sum(order_details.amount) AS total
 FROM
 	order_details
@@ -125,14 +126,14 @@ WHERE
 AND orders.created_at <= '{$time_end}'
 GROUP BY
 	date,
-	order_details.goods_id";
+		orders.shop_id";
         $rows=DB::select($sql);
         //dd($rows);
         //获取当前商家的菜品列表
-        $menus=Menu::select(['id','goods_name'])->get();
+        $menus=Shops::select(['id','shop_name'])->get();
         //构造3月统计格式
         $keyed=$menus->mapWithKeys(function ($item){
-            return [$item['id']=>$item['goods_name']];
+            return [$item['id']=>$item['shop_name']];
         });
         $keyed2 = $menus->mapWithKeys(function ($item) {
             return [$item['id'] => 0];
@@ -149,14 +150,13 @@ GROUP BY
             }
         }
         foreach($rows as $row){
-            $result[$row->goods_id][$row->date]=$row->total;
+            $result[$row->shop_id][$row->date]=$row->total;
         }
         $series=[];
         foreach ($result as $id=>$data){
             $serie=[
                 'name'=>$menus[$id],
                 'type'=>'line',
-                'stack'=>'销量',
                 'data'=>array_values($data),
             ];
             $series[]=$serie;

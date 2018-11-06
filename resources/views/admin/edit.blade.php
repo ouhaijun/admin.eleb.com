@@ -14,9 +14,15 @@
             <label>密码</label>
             <input type="password" name="password"  value="{{ $admin->password }}" class="form-control">
         </div>
+        <div class="form-group">
+            <label>角色</label>
+            @foreach($roles as $role)
+                <input type="checkbox" name="role_id[]"  value="{{ $role->id }}" @if($admin->hasRole($role->name))checked="checked"@endif>{{ $role->name }}
+            @endforeach
+        </div>
         {{ method_field('put') }}
         {{ csrf_field() }}
-        <button class="btn btn-primary btn-block">添加</button>
+        <button class="btn btn-primary btn-block">修改</button>
     </form>
 
 @stop

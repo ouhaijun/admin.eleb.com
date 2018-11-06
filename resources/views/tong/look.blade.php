@@ -7,7 +7,7 @@
     <h1>最近一周订单统计</h1>
     <table class="table table-bordered table-responsive">
         <tr>
-            <th>菜品名称</th>
+            <th>商家名称</th>
             @foreach($week as $day)
             <th>{{ $day }}</th>
             @endforeach

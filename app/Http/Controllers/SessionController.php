@@ -46,6 +46,11 @@ class SessionController extends Controller
 //            return redirect()->route('users.index')->with('success','登陆成功');
 
         }else{
+            /*$pwd=Admin::where('name',$request->name)->first();
+
+            if(Hash::needsRehash($pwd->password)) {
+                return back()->with('danger','原密码错误,请重新输入')->withInput();
+            }*/
             return back()->with('danger','用户名或密码错误,请重新登录')->withInput();
         }
     }
