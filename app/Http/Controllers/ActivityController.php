@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityController extends Controller
 {
@@ -13,7 +14,7 @@ class ActivityController extends Controller
         //做权限验证
         $this->middleware('auth',[
             //除了那些方法生效
-            'except'=>['index'],
+            'except'=>[''],
 
             //只对那些方法生效
             //'only'=>[]
@@ -23,6 +24,9 @@ class ActivityController extends Controller
     //添加
     public function create()
     {
+        if(!Auth::user()->can('/activitys/create')){
+            return "<h1>权限不够</h1>";
+        }
         return view('activity.add');
 
     }
@@ -52,6 +56,9 @@ class ActivityController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/activitys')){
+            return "<h1>权限不够</h1>";
+        }
         //dd($_GET);
         $begin=$_GET['begin'] ?? null;
         $hand=$_GET['hand'] ?? null;
@@ -104,6 +111,7 @@ class ActivityController extends Controller
     //删除
     public function destroy(activity $activity)
     {
+
         $activity->delete();
         return redirect('activitys')->with('success','删除成功');
 

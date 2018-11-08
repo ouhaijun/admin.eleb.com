@@ -6,6 +6,7 @@ use App\Models\Shop_Category;
 use App\Models\Shops;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,7 +18,7 @@ class ShopsController extends Controller
         //做权限验证
         $this->middleware('auth',[
             //除了那些方法生效
-            'except'=>['index'],
+            'except'=>[''],
 
             //只对那些方法生效
             //'only'=>[]
@@ -26,6 +27,9 @@ class ShopsController extends Controller
     }
     public function create()
     {
+        if(!Auth::user()->can('/shops/create')){
+            return "<h1>权限不够</h1>";
+        }
         $shops=Shop_Category::all();
         return view('shop.add',compact('shops'));
 
@@ -106,6 +110,9 @@ class ShopsController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/shops')){
+            return "<h1>权限不够</h1>";
+        }
         $shops=Shops::paginate(3);
         return view('shop.index',compact('shops'));
 

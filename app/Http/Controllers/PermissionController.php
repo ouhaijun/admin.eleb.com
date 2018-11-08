@@ -3,15 +3,31 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 class PermissionController extends Controller
 {
+    public function __construct()
+    {
+        //做权限验证
+        $this->middleware('auth',[
+            //除了那些方法生效
+            'except'=>[''],
+
+            //只对那些方法生效
+            //'only'=>[]
+        ]);
+
+    }
     //添加权限
     use HasRoles;
     public function create()
     {
+        if(!Auth::user()->can('/permission/create')){
+            return "<h1>权限不够</h1>";
+        }
         return view('permission.add');
 
     }
@@ -31,6 +47,9 @@ class PermissionController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/permission')){
+            return "<h1>权限不够</h1>";
+        }
         $permissions=Permission::paginate(20);
         //dd($permissions);
         return view('permission.index',compact('permissions'));

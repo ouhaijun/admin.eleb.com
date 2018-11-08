@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
@@ -11,8 +12,24 @@ class RoleController extends Controller
 {
     //
     use HasRoles;
+
+    public function __construct()
+    {
+        //做权限验证
+        $this->middleware('auth',[
+            //除了那些方法生效
+            'except'=>[''],
+
+            //只对那些方法生效
+            //'only'=>[]
+        ]);
+
+    }
     public function create()
     {
+        if(!Auth::user()->can('/role/create')){
+            return "<h1>权限不够</h1>";
+        }
         $permissions=Permission::all();
         return view('role.add',compact('permissions'));
 
@@ -44,6 +61,9 @@ class RoleController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/role')){
+            return "<h1>权限不够</h1>";
+        }
         $roles=Role::paginate(3);
         //dd($permissions);
         return view('role.index',compact('roles'));
@@ -69,22 +89,22 @@ class RoleController extends Controller
         $role->update([
             'name'=>$request->name,
         ]);
-
+        /*$permissions=[];
         if($request->permission_id){
-            $permissions=[];
+
             $permissions_id=$request->permission_id;
             foreach ($permissions_id as $permission_id){
                 $permission=Permission::find($permission_id);
                 $permissions[]=$permission;
             }
-            $role->syncPermissions($permissions);
+
         }else{
             $rolepermissions=$role->getAllPermissions();
             foreach ($rolepermissions as $permission){
                 $role->revokePermissionTo($permission->name);
             }
-        }
-
+        }*/
+        $role->syncPermissions($request->permission_id);
         return redirect('role')->with('success','修改成功');
 
     }

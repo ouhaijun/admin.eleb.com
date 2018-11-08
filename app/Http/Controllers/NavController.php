@@ -4,13 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\Nav;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 
 class NavController extends Controller
 {
+    public function __construct()
+    {
+        //做权限验证
+        $this->middleware('auth',[
+            //除了那些方法生效
+            'except'=>[''],
+
+            //只对那些方法生效
+            //'only'=>[]
+        ]);
+
+    }
     //添加菜单
     public function create()
     {
+        if(!Auth::user()->can('/nav/create')){
+            return "<h1>权限不够</h1>";
+        }
         $urls=Permission::all();
         $navs=Nav::where('pid',0)->get();
         return view('nav.add',compact('navs','urls'));
@@ -41,6 +57,9 @@ class NavController extends Controller
     //菜单列表
     public function index()
     {
+        if(!Auth::user()->can('/nav')){
+            return "<h1>权限不够</h1>";
+        }
         $navs=Nav::paginate(50);
         return view('nav.index',compact('navs'));
     }

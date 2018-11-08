@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop_Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class Shop_CategoryController extends Controller
@@ -14,7 +15,7 @@ class Shop_CategoryController extends Controller
         //做权限验证
         $this->middleware('auth',[
             //除了那些方法生效
-            'except'=>['index'],
+            'except'=>[''],
 
             //只对那些方法生效
             //'only'=>[]
@@ -24,6 +25,9 @@ class Shop_CategoryController extends Controller
     //添加商品分类
     public function create()
     {
+        if(!Auth::user()->can('/shop_categorys/create')){
+            return "<h1>权限不够</h1>";
+        }
         return view('shop_category.add');
 
     }
@@ -51,6 +55,9 @@ class Shop_CategoryController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/shop_categorys')){
+            return "<h1>权限不够</h1>";
+        }
         $shop_categorys=Shop_Category::paginate(3);
         return view('shop_category.index',compact('shop_categorys'));
 

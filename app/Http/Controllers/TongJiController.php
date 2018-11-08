@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\DB;
 
 class TongJiController extends Controller
 {
+    public function __construct()
+    {
+        //做权限验证
+        $this->middleware('auth',[
+            //除了那些方法生效
+            'except'=>[''],
+
+            //只对那些方法生效
+            //'only'=>[]
+        ]);
+
+    }
     //
     public function week()
     {

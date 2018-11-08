@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('session.create');
 });
 
 //商品分类
@@ -92,3 +92,4 @@ Route::resource('nav','NavController');
 Route::resource('event','EventController');
 //抽奖活动奖品管理
 Route::resource('eventprize','EventPrizeController');
+

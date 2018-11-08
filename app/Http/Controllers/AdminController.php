@@ -18,7 +18,7 @@ class AdminController extends Controller
         //做权限验证
         $this->middleware('auth',[
             //除了那些方法生效
-            'except'=>['index'],
+            'except'=>[''],
 
             //只对那些方法生效
             //'only'=>[]
@@ -28,6 +28,9 @@ class AdminController extends Controller
     //添加
     public function create()
     {
+        if(!Auth::user()->can('/admins/create')){
+            return "<h1>权限不够</h1>";
+        }
         $roles=Role::all();
         return view('admin.add',compact('roles'));
 
@@ -64,6 +67,9 @@ class AdminController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/admins')){
+            return "<h1>权限不够</h1>";
+        }
         $admins=Admin::paginate(3);
         return view('admin.index',compact('admins'));
 

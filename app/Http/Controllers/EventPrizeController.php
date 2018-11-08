@@ -5,12 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\EventPrize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventPrizeController extends Controller
 {
+    public function __construct()
+    {
+        //做权限验证
+        $this->middleware('auth',[
+            //除了那些方法生效
+            'except'=>[''],
+
+            //只对那些方法生效
+            //'only'=>[]
+        ]);
+
+    }
     //添加抽奖活动奖品管理
     public function create()
     {
+        if(!Auth::user()->can('/eventprize/create')){
+            return "<h1>权限不够</h1>";
+        }
         $events=Event::all();
         return view('eventprize.add',compact('events'));
 
@@ -40,6 +56,9 @@ class EventPrizeController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/eventprize')){
+            return "<h1>权限不够</h1>";
+        }
         $eventprizes=EventPrize::paginate(10);
         return view('eventprize.index',compact('eventprizes'));
 

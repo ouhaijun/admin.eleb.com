@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Shops;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use function Sodium\compare;
 
 class UsersController extends Controller
@@ -15,7 +16,7 @@ class UsersController extends Controller
         //做权限验证
         $this->middleware('auth',[
             //除了那些方法生效
-            'except'=>['index'],
+            'except'=>[''],
 
             //只对那些方法生效
             //'only'=>[]
@@ -25,6 +26,9 @@ class UsersController extends Controller
     //添加商家账号
     public function create()
     {
+        if(!Auth::user()->can('/users/create')){
+            return "<h1>权限不够</h1>";
+        }
         $users=Shops::all();
         return view('user.add',compact('users'));
 
@@ -61,6 +65,9 @@ class UsersController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/users')){
+            return "<h1>权限不够</h1>";
+        }
         $users=User::paginate();
         return view('user.index',compact('users'));
     }

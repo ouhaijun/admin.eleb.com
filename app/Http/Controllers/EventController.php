@@ -4,12 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
+    public function __construct()
+    {
+        //做权限验证
+        $this->middleware('auth',[
+            //除了那些方法生效
+            'except'=>[''],
+
+            //只对那些方法生效
+            //'only'=>[]
+        ]);
+
+    }
     //添加活动
     public function create()
     {
+        if(!Auth::user()->can('/event/create')){
+            return "<h1>权限不够</h1>";
+        }
         return view('event.add');
 
     }
@@ -46,6 +62,9 @@ class EventController extends Controller
     //列表
     public function index()
     {
+        if(!Auth::user()->can('/event')){
+            return "<h1>权限不够</h1>";
+        }
         $events=Event::paginate(10);
         return view('event.index',compact('events'));
 
